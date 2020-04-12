@@ -1,0 +1,18 @@
+{
+  "name": "vendor_name/StockCrawler",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "imac",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "spatie/crawler": "^4.6",
+    "fabpot/goutte": "^4.0",
+    "emanueleminotto/simple-html-dom": "^1.5",
+    "symfony/dom-crawler": "^5.0",
+  }
+}
