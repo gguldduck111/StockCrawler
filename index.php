@@ -1,8 +1,17 @@
 <?php
-ini_set("memory_limit" , -1);
+@set_time_limit(0);
+ini_set("memory_limit", -1);
 require 'vendor/autoload.php';
+
 use Goutte\Client;
 use Symfony\Component\HttpClient\HttpClient;
+
+if (isset($_GET['s']) === false) {
+    echo '망';
+    exit;
+}
+$start = $_GET['s'];
+$end = $_GET['e'];
 
 $mysql_hostname = 'database-1.cwugzci3e2pd.ap-northeast-2.rds.amazonaws.com';
 
@@ -15,70 +24,100 @@ $conn = mysqli_connect($mysql_hostname, $username, $password, $dbname);
 // Check connection
 if (!$conn) {
     $error = mysqli_connect_error();
-    print $error .": error\n";
+    print $error . ": error\n";
     exit();
 }
 
-$client = new Client(HttpClient::create(['timeout' => 60]));
-$sql = 'INSERT INTO stock VALUES';
-for($i =1 ; $i <101 ; $i++){
-    $url = 'https://finance.naver.com/item/sise_day.nhn?code=005930&page='.$i;
+mysqli_set_charset($conn, 'utf8');
 
-    $crawler = $client->request('GET', $url);
+$row = 1;
 
+if (($handle = fopen("kospi.csv", "r")) !== FALSE) {
 
-    $news = $crawler->filter('table')->filter('tr')->each(
-        function ($tr, $i) {
+    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $cName = '';
+        $cCode = '';
+        $num = count($data);
 
-            if ($i <16){
-                $realData = $tr->filter('td')->each(function ($td, $i) {
-                    $rVal = trim($td->text());
-
-                    if ($i === 0){
-                        $dd = str_replace('.','',$rVal);
-                        $rVal = date("Y-m-d",strtotime($dd));
-                    }elseif ($i === 2){
-                        if(strpos($td->filter('span')->attr('class'),'nv01') !== false){
-                            $dd = str_replace(',','',$rVal);
-                            $rVal = -$dd;
-                        }else{
-                            $rVal = str_replace(',','',$rVal);
-                        }
-
-                    }else{
-                        $rVal = str_replace(',','',$rVal);
-                    }
-                    return $rVal;
-
-                });
-                if (sizeof($realData) === 7)
-                    return $realData;
+        $row++;
+        for ($c = 0; $c < $num; $c++) {
+            if ($c == 1) {
+                if ($data[$c] === '종목코드' && $data[$c] === '' && intval($data[$c]) === 0)
+                    break;
+                $cCode = $data[$c];
             }
 
-        });
+            if ($c == 2) {
+                $cName = $data[$c];
+            }
+        }
 
-    foreach ($news as $item){
-        if ($item !== '' && $item !== null) {
-            $name = '삼성전자';
-            $code= '005930';
-            $sql .= sprintf('("%s","%s",%d,%d,%d,%d,%d,%d,"%s","%s"),',$code,$name,$item[1],$item[2],$item[3],$item[4],$item[5],$item[6],$item[0],date('Y-m-d H:i:s'));
+        $client = new Client(HttpClient::create(['timeout' => 60]));
+        $sql = 'INSERT INTO stock VALUES';
+        for ($i = $start; $i < $end; $i++) {
+            $url = sprintf('https://finance.naver.com/item/sise_day.nhn?code=%s&page=%d', $cCode, $i);
+            $crawler = $client->request('GET', $url);
+
+            $pageNo = $crawler->filterXPath('//table[@class="Nnavi"]')->filter('tr')->each(
+                function ($tr, $i) {
+                    $tmpPage = $tr->filterXPath('//td[@class="on"]')->each(function ($atag, $i) {
+                        return $atag->text();
+                    });
+
+                    return $tmpPage[0];
+                }
+            );
+
+            if (intval($pageNo[0]) !== intval($i))
+                break;
+
+            $news = $crawler->filterXPath('//table[@class="type2"]')->filter('tr')->each(
+                function ($tr, $i) {
+                    $realData = $tr->filter('td')->each(function ($td, $i) {
+                        $rVal = str_replace("\xc2\xa0", '', $td->text());
+                        if ($rVal !== '') {
+                            if ($i === 0) {
+                                $dd = str_replace('.', '', $rVal);
+                                $rVal = date("Y-m-d", strtotime($dd));
+                            } elseif ($i === 2) {
+                                if (strpos($td->filter('span')->attr('class'), 'nv01') !== false) {
+                                    $dd = str_replace(',', '', $rVal);
+                                    $rVal = -$dd;
+                                } else {
+                                    $rVal = str_replace(',', '', $rVal);
+                                }
+
+                            } else {
+                                $rVal = str_replace(',', '', $rVal);
+                            }
+                            return $rVal;
+                        }
+                    });
+                    if (sizeof($realData) === 7)
+                        return $realData;
+
+                });
+            $insertData = array_filter($news);
+            foreach ($insertData as $item) {
+                if ($item !== '' && $item !== null) {
+                    $sql .= sprintf('("%s","%s",%d,%d,%d,%d,%d,%d,"%s","%s"),', $cCode, $cName, $item[1], $item[2], $item[3], $item[4], $item[5], $item[6], $item[0], date('Y-m-d H:i:s'));
+                }
+            }
+
+            sleep(0.5);
+        }
+
+        $insertSql = substr($sql, 0, -1);
+
+        if ($conn->query($insertSql) === TRUE) {
+            echo $cName . " :: New record created successfully <br>";
+        } else {
+            echo "Error: " . $sql . " " . $conn->error;
         }
     }
 
-    sleep(1);
+    fclose($handle);
 }
-
-$insertSql = substr($sql , 0, -1);
-
-if ($conn->query($insertSql) === TRUE) {
-    echo "New record created successfully";
-} else {
-    echo "Error: " . $sql . "
-" . $conn->error;
-}
-
 $conn->close();
-
-echo $insertSql;
 
 
