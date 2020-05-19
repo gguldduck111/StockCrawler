@@ -449,16 +449,16 @@
     };
 
     var TEMPLATE = '<tr>\n' +
-        '            <td class="jb-x-small">%s <input type="hidden" name="orderNo[]" value="adsfsdf"></td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="orderNo[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="itemName[]" value="%s"></td>\n' +
         '            <td class="jb-x-small"></td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
-        '            <td class="jb-x-small">%s</td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="count[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="recipient[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="postCode[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="addr[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="phone1[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="phone2[]" value="%s"></td>\n' +
+        '            <td class="jb-x-small">%s <input type="hidden" name="msg[]" value="%s"></td>\n' +
         '            <td class="jb-x-small"></td>\n' +
         '            <td class="jb-x-small"></td>\n' +
         '        </tr>';
@@ -493,7 +493,7 @@
 
                         // sendDataArr[i]['key']
 
-                        var insertData = $.sprintf(TEMPLATE,orderNo,itemName,count,recipient,postCode,addr,phone1,phone2,msg);
+                        var insertData = $.sprintf(TEMPLATE,orderNo,orderNo,itemName,itemName,count,count,recipient,recipient,postCode,postCode,addr,addr,phone1,phone1,phone2,phone2,msg,msg);
                         $('#body').append(insertData);
                     }
                 })
