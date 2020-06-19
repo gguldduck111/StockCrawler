@@ -26,8 +26,8 @@ $phpExcel -> getActiveSheet() -> getColumnDimension("G") -> setWidth(90);
 $phpExcel -> getActiveSheet() -> getColumnDimension("H") -> setWidth(19);
 $phpExcel -> getActiveSheet() -> getColumnDimension("I") -> setWidth(19);
 $phpExcel -> getActiveSheet() -> getColumnDimension("J") -> setWidth(50);
-$phpExcel -> getActiveSheet() -> getColumnDimension("K") -> setWidth(2);
-$phpExcel -> getActiveSheet() -> getColumnDimension("L") -> setWidth(2);
+$phpExcel -> getActiveSheet() -> getColumnDimension("K") -> setWidth(10);
+$phpExcel -> getActiveSheet() -> getColumnDimension("L") -> setWidth(10);
 
 
 $phpExcel->setActiveSheetIndex(0)
@@ -62,7 +62,7 @@ foreach ($orderNo as $i => $item){
 
 $phpExcel->setActiveSheetIndex(0);
 $tmpName = date('Ymd');
-$filename = iconv("UTF-8", "EUC-KR", $tmpName.'-발');
+$filename = iconv("UTF-8", "EUC-KR", $tmpName.'-발주');
 
 header("Content-Type:application/vnd.ms-excel");
 header("Content-Disposition: attachment;filename=".$filename.".xls");

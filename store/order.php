@@ -476,19 +476,20 @@
                 let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
                 $(rows).each(function (i,item) {
                     if (i>0){
+                        console.log(item);
                         var orderNo = today+'-'+i;
                         var itemName = '';
-                        var recipient = item.__EMPTY_7;
-                        var addr = item.__EMPTY_39;
-                        var count = item.__EMPTY_17;
-                        var postCode = item.__EMPTY_41;
-                        var phone1 = item.__EMPTY_37;
-                        var phone2 = item.__EMPTY_38;
-                        var msg = item.__EMPTY_42;
+                        var recipient = item.__EMPTY_8;
+                        var addr = item.__EMPTY_40;
+                        var count = item.__EMPTY_18;
+                        var postCode = item.__EMPTY_42;
+                        var phone1 = item.__EMPTY_38;
+                        var phone2 = item.__EMPTY_39;
+                        var msg = item.__EMPTY_43;
                         if (item.__EMPTY_14 == '단일상품'){
-                            itemName = item.__EMPTY_34;
+                            itemName = item.__EMPTY_35;
                         }else{
-                            itemName = item.__EMPTY_34 + ' - '+item.__EMPTY_15;
+                            itemName = item.__EMPTY_35 + ' - '+item.__EMPTY_16;
                         }
 
                         // sendDataArr[i]['key']
