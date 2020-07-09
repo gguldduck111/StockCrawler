@@ -76,6 +76,8 @@
     sizeDic['naverSub'] = 860;
     sizeDic['kakao'] = 750;
 
+    var nameArr = ['naverMain','naverSub','kakao'];
+
     function select(){
         var imgName = '\/'+$('#image_name').val();
         console.log(imgName);
@@ -103,7 +105,7 @@
                     reader.readAsDataURL(file);
 
                     // resizing 이후 파일
-                    fileMap.set(rr+"_"+file.name,resizedImage);
+                    fileMap.set(nameArr[rr]+imgName,resizedImage);
                     rr++;
                     // var path = i + imgName
                     // download(resizedImage,path,"image/jpg");
@@ -114,9 +116,12 @@
 
     }
 
+    function logMapElements(value, key, map) {
+        download(value,key,"image/jpg");
+    }
+
     function upload(){
-        console.log(fileMap);
-        // download(fileMap.get(0),"strcode.png","image/png");
+        fileMap.forEach(logMapElements);
     }
 </script>
 </body>
